@@ -1,22 +1,24 @@
-import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import MyNav from "./components/MyNav";
 import MyFooter from "./components/MyFooter";
 import Welcome from "./components/Welcome";
-import AllTheBooks from "./components/AllTheBooks";
+import BookList from "./components/BookList";
+import BookSelector from "./components/BookSelector";
+import { useState } from "react";
+import fantasyBooks from "./data/fantasy.json";
+
 function App() {
+  const [currentBooks, setCurrentBooks] = useState(fantasyBooks);
+
   return (
-    <div className="d-flex flex-column min-vh-100">
-      <header>
-        <MyNav />
-      </header>
-      <main className="flex-grow-1 bg-secondary">
+    <div className="d-flex flex-column min-vh-100 bg-secondary">
+      <MyNav />
+      <main className="flex-grow-1">
         <Welcome />
-        <AllTheBooks />
+        <BookSelector CategoryChange={(books) => setCurrentBooks(books)} />
+        <BookList books={currentBooks} />
       </main>
-      <footer>
-        <MyFooter />
-      </footer>
+      <MyFooter />
     </div>
   );
 }
