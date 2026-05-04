@@ -1,37 +1,56 @@
-import { useState } from "react";
+import { Component } from "react";
 import { Container, Row, Col, Form } from "react-bootstrap";
 import SingleBook from "./SingleBook";
-
-const BookList = (props) => {
-  const [searchQuery, setSearchQuery] = useState("");
-  return (
-    <Container fluid>
-      <Row className="justify-content-center my-3">
-        <Col md={6}>
-          <Form.Group>
-            <Form.Control
-              type="text"
-              placeholder="Cerca un libro..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </Form.Group>
-        </Col>
-      </Row>
-
-      <Row>
-        {props.books
-          .filter((b) =>
-            b.title.toLowerCase().includes(searchQuery.toLowerCase()),
-          )
-          .map((b) => (
-            <Col xs={12} md={6} lg={3} key={b.asin}>
-              <SingleBook book={b} />
+import CommentArea from "./CommentArea";
+class BookList extends Component {
+  state = {
+    searchQuery: "",
+    selectedAsin: null,
+  };
+  render() {
+    return (
+      <div>
+        <Container fluid>
+          <Row className="justify-content-center my-3">
+            <Col md={8}>
+              <Form.Group>
+                <Form.Control
+                  type="text"
+                  placeholder="Cerca un libro..."
+                  value={this.state.searchQuery}
+                  onChange={(e) =>
+                    this.setState({ searchQuery: e.target.value })
+                  }
+                />
+              </Form.Group>
             </Col>
-          ))}
-      </Row>
-    </Container>
-  );
-};
+            <Col md={4}>
+              <CommentArea asin={this.state.selectedAsin} />
+            </Col>
+          </Row>
+          <Row>
+            {this.props.books
+              .filter((b) =>
+                b.title
+                  .toLowerCase()
+                  .includes(this.state.searchQuery.toLowerCase()),
+              )
+              .map((b) => (
+                <Col xs={12} md={6} lg={3} key={b.asin}>
+                  <SingleBook
+                    book={b}
+                    selectedAsin={this.state.selectedAsin}
+                    changeSelectedAsin={(asin) =>
+                      this.setState({ selectedAsin: asin })
+                    }
+                  />
+                </Col>
+              ))}
+          </Row>
+        </Container>
+      </div>
+    );
+  }
+}
 
 export default BookList;

@@ -6,15 +6,24 @@ import AddComment from "./AddComment";
 class CommentArea extends Component {
   state = {
     comments: [],
-    isLoading: true,
+    isLoading: false,
     isError: false,
   };
 
   componentDidMount() {
-    this.fetchComments();
+    if (this.props.asin) {
+      this.fetchComments();
+    }
+  }
+  componentDidUpdate(prevProps) {
+    if (prevProps.asin !== this.props.asin) {
+      this.fetchComments();
+    }
   }
 
   fetchComments = () => {
+    if (!this.props.asin) return;
+    this.setState({ isLoading: true, isError: false });
     fetch(
       "https://striveschool-api.herokuapp.com/api/comments/" + this.props.asin,
       {
@@ -49,20 +58,29 @@ class CommentArea extends Component {
   render() {
     return (
       <div className="mt-3 text-dark">
-        <h6>Recensioni:</h6>
-
-        {this.state.isLoading && (
-          <Spinner animation="border" variant="primary" />
-        )}
-
-        {this.state.isError && (
-          <Alert variant="danger">
-            Si è verificato un errore nel caricamento dei commenti.
+        {!this.props.asin ? (
+          <Alert variant="info">
+            Seleziona un libro per visualizzare i commenti
           </Alert>
-        )}
+        ) : (
+          <>
+            {this.state.isLoading && (
+              <Spinner animation="border" variant="primary" />
+            )}
 
-        <AddComment asin={this.props.asin} />
-        <CommentList comments={this.state.comments} />
+            {this.state.isError && (
+              <Alert variant="danger">
+                Errore nel caricamento dei commenti.
+              </Alert>
+            )}
+            <AddComment
+              asin={this.props.asin}
+              onCommentAdded={this.fetchComments}
+            />
+            <h6>Recensioni per per il libro: {this.props.asin}</h6>
+            <CommentList comments={this.state.comments} />
+          </>
+        )}
       </div>
     );
   }
